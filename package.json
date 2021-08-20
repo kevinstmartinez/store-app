@@ -4,15 +4,24 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon src/index.js --exec babel-node"
+    "dev": "nodemon src/"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "connect-flash": "^0.1.1",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "express-handlebars": "^5.3.3",
+    "express-mysql-session": "^2.1.6",
+    "express-session": "^1.17.2",
+    "express-validator": "^6.12.1",
     "morgan": "^1.10.0",
-    "mysql2": "^2.3.0"
+    "mysql": "^2.18.1",
+    "mysql2": "^2.3.0",
+    "passport-local": "^1.0.0",
+    "timeago.js": "^4.0.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.8",
