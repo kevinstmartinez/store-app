@@ -6,28 +6,16 @@ CREATE TABLE role(
     name VARCHAR(45)
 );
 
-CREATE TABLE user(
-    id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    id_role INT(11),
-    FOREIGN KEY (id_role) references role (id)
-);
-CREATE TABLE seller(
-    id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    dni INT(11),
-    name VARCHAR(45),
-    lastname VARCHAR(45),
-    phone INT(11),
-    email VARCHAR(45),
-    user_id INT(11),
-    FOREIGN KEY (user_id) references user (id)
-);
 CREATE TABLE store(
     id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
     name VARCHAR(45),
-    description VARCHAR(45),
+    last_name VARCHAR(45),
+    username VARCHAR(45),
+    phone VARCHAR(45),
     address VARCHAR(45),
-    seller_id INT(11),
-    FOREIGN KEY (seller_id) references seller (id)
+    store_name VARCHAR(45),
+    id_role INT(11), 
+    FOREIGN KEY (id_role) references role (id)
 );
 CREATE TABLE client(
     id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
@@ -88,3 +76,8 @@ CREATE TABLE sale_product(
     FOREIGN KEY (id_product) references product (id),
     FOREIGN KEY (id_sale) references sale (id)
 );
+
+
+INSERT INTO role values(1, 'admin');
+INSERT INTO role values(2, 'seller');
+INSERT INTO role values(3, 'support');
