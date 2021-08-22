@@ -2,6 +2,10 @@ import express from 'express'
 import morgan from 'morgan'
 
 import register from './routes/authentication.routes'
+import login from './routes/authentication.routes'
+
+
+
 const app = express()
 
 const port = 4000 || process.env.PORT
@@ -12,6 +16,7 @@ app.use(express.json())
 
 app.use(require('./routes'))
 app.use('/auth', register)
+app.use('/auth', login)
 
 
 app.listen(port, () => {

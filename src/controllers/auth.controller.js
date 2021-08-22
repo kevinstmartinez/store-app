@@ -39,5 +39,39 @@ const register = (req, res) => {
   })
 }
 
+const login = async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    console.log("req", req.body);
+    if (!username || !password) {
+      return res.status(400).json({
+        message: "Please provide an username and password",
+      });
+    }
 
-module.exports = register
+    const stores = await pool.query("SELECT * FROM store WHERE username=?", [ username,
+    ]);
+
+    if (!stores[0]) res.status(400).json({ message: "Store Not Found" });
+
+    const matchPassword = await bcrypt.compare(password, stores[0].password);
+
+    if (!matchPassword)
+      return res.status(401).json({ token: null, message: "Invalid password" });
+
+    const token = jwt.sign(
+      { id: stores[0].id, username: stores[0].username, store: stores[0].store_name },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: process.env.JWT_EXPIRES_IN,
+      }
+    );
+
+    res.status(200).json({ name: stores[0].store_name, token });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+module.exports = { register, login }
