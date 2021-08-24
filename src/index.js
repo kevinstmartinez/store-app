@@ -3,6 +3,7 @@ import morgan from 'morgan'
 
 import register from './routes/authentication.routes'
 import login from './routes/authentication.routes'
+import createCategory from './routes/inventory.routes'
 
 
 
@@ -13,10 +14,11 @@ const port = 4000 || process.env.PORT
 app.use(morgan('dev'))
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
-
 app.use(require('./routes'))
 app.use('/auth', register)
 app.use('/auth', login)
+app.use('/inventory',createCategory)
+
 
 
 app.listen(port, () => {
