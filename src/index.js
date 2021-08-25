@@ -4,8 +4,8 @@ import morgan from 'morgan'
 import register from './routes/authentication.routes'
 import login from './routes/authentication.routes'
 import createCategory from './routes/inventory.routes'
-
-
+import creatSupplier from './routes/supplier.routes'
+import createProducts from './routes/products.routes'
 
 const app = express()
 
@@ -18,7 +18,8 @@ app.use(require('./routes'))
 app.use('/auth', register)
 app.use('/auth', login)
 app.use('/inventory',createCategory)
-
+app.use('/supplier', creatSupplier)
+app.use('/products',createProducts)
 
 
 app.listen(port, () => {
