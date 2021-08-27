@@ -15,7 +15,7 @@ const createSupplier = async (req, res) => {
     console.log(suppliers)
     console.log(phone)
 
-    for(var i=0; i<suppliers.length;i++) {
+    for(let i=0; i<suppliers.length; i++) {
       if (suppliers[i].phone == phone) {
          return res.status(400).json({
           message: 'The supplier is already register, verify the fields.',

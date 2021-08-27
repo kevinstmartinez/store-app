@@ -6,7 +6,10 @@ import login from './routes/authentication.routes'
 import createCategory from './routes/inventory.routes'
 import creatSupplier from './routes/supplier.routes'
 import createProducts from './routes/products.routes'
+import getPhoto from './routes/products.routes'
 import createClient from './routes/client.routes'
+
+
 
 const app = express()
 
@@ -22,6 +25,7 @@ app.use('/inventory',createCategory)
 app.use('/supplier', creatSupplier)
 app.use('/products',createProducts)
 app.use('/client',createClient)
+app.use('/products',getPhoto)
 
 
 

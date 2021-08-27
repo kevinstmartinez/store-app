@@ -14,7 +14,7 @@ const createClient = async (req, res) => {
     console.log(client)
     console.log(phone)
 
-    for (var i = 0; i < client.length; i++) {
+    for (let i = 0; i < client.length; i++) {
       if (client[i].phone == phone) {
         return res.status(400).json({
           message: 'The client is already register, verify the fields.',

@@ -1,6 +1,7 @@
 import pool from '../database'
 import jwt_decode from 'jwt-decode'
 
+
 const createProducts = async (req, res) => {
   const {
     barcode,
@@ -13,6 +14,8 @@ const createProducts = async (req, res) => {
     unit_cost,
     unit_price,
   } = req.body
+  const date = new Date(req.body.expiration_date)
+
   try {
     const token = req.headers.authorization
     const decoded = jwt_decode(token.slice(7, -1))
@@ -32,16 +35,14 @@ const createProducts = async (req, res) => {
       'SELECT * FROM supplier WHERE id_store=?',
       [decoded.id]
     )
-     
-  
-    
 
+   
     await pool.query('INSERT INTO product SET?', {
       barcode,
-      expiration_date,
+      expiration_date: date,
       id_category:category[0].id,
       id_supplier:supplier[0].id,
-      //image,
+      image: req.file.filename,
       name,
       quantity,
       unit_cost,
@@ -62,4 +63,11 @@ const createProducts = async (req, res) => {
   }
 }
 
-module.exports = createProducts
+const getPhoto = async (req, res) =>{
+  const { id } = req.params
+  const products = await pool.query('SELECT * FROM product WHERE id=?',[id])
+  console.log(products)
+  res.json({products})
+}
+
+module.exports = {createProducts, getPhoto}
