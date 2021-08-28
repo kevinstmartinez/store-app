@@ -77,6 +77,18 @@ CREATE TABLE sale_product(
     FOREIGN KEY (id_sale) references sale (id)
 );
 
+CREATE TABLE sale(
+    id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    date_sale date,
+    quantity INT(11) NOT NULL,
+    status BOOLEAN,
+    description VARCHAR(45),
+    price_sale DOUBLE NOT NULL,
+    id_product INT(11) NOT NULL,
+    id_client INT(11) NOT NULL,
+    FOREIGN KEY (id_client) references client (id),
+    FOREIGN KEY (id_product) references product (id)
+);
 
 INSERT INTO role values(1, 'admin');
 INSERT INTO role values(2, 'seller');

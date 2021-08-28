@@ -8,6 +8,7 @@ import creatSupplier from './routes/supplier.routes'
 import createProducts from './routes/products.routes'
 import getPhoto from './routes/products.routes'
 import createClient from './routes/client.routes'
+import createSale from './routes/sale.routes'
 
 
 
@@ -26,7 +27,7 @@ app.use('/supplier', creatSupplier)
 app.use('/products',createProducts)
 app.use('/client',createClient)
 app.use('/products',getPhoto)
-
+app.use('/api/sales/', createSale)
 
 
 app.listen(port, () => {

@@ -40,13 +40,13 @@ const createProducts = async (req, res) => {
     await pool.query('INSERT INTO product SET?', {
       barcode,
       expiration_date: date,
-      id_category:category[0].id,
+      id_category,
       id_supplier:supplier[0].id,
       image: req.file.filename,
       name,
       quantity,
       unit_cost,
-      unit_price,
+      unit_price
     }) 
 
     console.log(category)
@@ -67,7 +67,7 @@ const getPhoto = async (req, res) =>{
   const { id } = req.params
   const products = await pool.query('SELECT * FROM product WHERE id=?',[id])
   console.log(products)
-  res.json({products})
+  res.render('/',products[0])
 }
 
 module.exports = {createProducts, getPhoto}
