@@ -4,6 +4,7 @@ import morgan from 'morgan'
 import register from './routes/authentication.routes'
 import login from './routes/authentication.routes'
 import createCategory from './routes/inventory.routes'
+import getInventory from './routes/inventory.routes'
 import creatSupplier from './routes/supplier.routes'
 import createProducts from './routes/products.routes'
 import getPhoto from './routes/products.routes'
@@ -28,6 +29,8 @@ app.use('/products',createProducts)
 app.use('/client',createClient)
 app.use('/products',getPhoto)
 app.use('/api/sales/', createSale)
+app.use('/api/inventory',getInventory)
+
 
 
 app.listen(port, () => {

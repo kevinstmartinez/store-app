@@ -52,7 +52,7 @@ const isSeller = async (req, res, next) => {
       req.id_store,
     ])
     const roles = await pool.query('SELECT * FROM role WHERE id=?', [
-      store[0].id_role
+      store[0].id_role,
     ])
     console.log(store)
     console.log(roles)
@@ -70,5 +70,5 @@ const isSeller = async (req, res, next) => {
 module.exports = {
   verifyToken,
   isAdmin,
-  isSeller
+  isSeller,
 }

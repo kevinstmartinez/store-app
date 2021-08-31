@@ -1,7 +1,6 @@
 import pool from '../database'
 import jwt_decode from 'jwt-decode'
 
-
 const createProducts = async (req, res) => {
   const {
     barcode,
@@ -21,6 +20,8 @@ const createProducts = async (req, res) => {
     const decoded = jwt_decode(token.slice(7, -1))
 
     console.log(decoded)
+
+    
     const inventory = await pool.query(
       'SELECT * FROM inventory WHERE id_store=?',
       [decoded.id]
@@ -36,38 +37,41 @@ const createProducts = async (req, res) => {
       [decoded.id]
     )
 
-   
-    await pool.query('INSERT INTO product SET?', {
+    const create_product = await pool.query('INSERT INTO product SET?', {
       barcode,
       expiration_date: date,
       id_category,
-      id_supplier:supplier[0].id,
+      id_supplier: supplier[0].id,
       image: req.file.filename,
       name,
       quantity,
       unit_cost,
-      unit_price
-    }) 
+      unit_price,
+    })
 
     console.log(category)
     console.log(inventory)
     console.log(supplier)
-     return res.status(200).json({
-       message: 'Product register successfully',
-     })
+    console.log(create_product)
+    return res.status(200).json({
+      message: 'Product register successfully',
+      create_product,
+    })
   } catch (e) {
-
-      return res.status(400).json({
-        message : "Failed"
-      })
+    return res.status(400).json({
+      message: 'Failed',
+    })
   }
 }
 
-const getPhoto = async (req, res) =>{
+const getPhoto = async (req, res) => {
   const { id } = req.params
-  const products = await pool.query('SELECT * FROM product WHERE id=?',[id])
+  const products = await pool.query('SELECT * FROM product WHERE id=?', [id])
   console.log(products)
-  res.render('/',products[0])
+   return res.status(200).json({
+        products
+   })
 }
 
-module.exports = {createProducts, getPhoto}
+ 
+module.exports = { createProducts, getPhoto }
