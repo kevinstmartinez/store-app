@@ -10,7 +10,7 @@ import createProducts from './routes/products.routes'
 import getPhoto from './routes/products.routes'
 import createClient from './routes/client.routes'
 import createSale from './routes/sale.routes'
-import createDebt_sale from './routes/sale.routes'
+import createDebtSale from './routes/sale.routes'
 
 const app = express()
 const session = require('express-session')
@@ -34,7 +34,7 @@ app.use('/products', createProducts)
 app.use('/client', createClient)
 app.use('/products', getPhoto)
 app.use('/api/sales/', createSale)
-app.use('/api/sales/', createDebt_sale)
+app.use('/api/sales/', createDebtSale)
 app.use('/api/inventory', getInventory)
 
 app.listen(port, () => {
