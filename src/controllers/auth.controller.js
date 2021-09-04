@@ -103,7 +103,6 @@ const login = async (req, res) => {
         expiresIn: process.env.JWT_EXPIRES_IN,
       }
     )
-
     res.status(200).json({ name: stores[0].store_name, token })
   } catch (error) {
     console.log(error)

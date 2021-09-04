@@ -25,6 +25,8 @@ const createCategory = async (req, res) => {
 
 const getInventory = async (req, res) => {
   let products = []
+  let objectCategories = {}
+
   try {
     const token = req.headers.authorization
     const decoded = jwt_decode(token.slice(7, -1))
@@ -46,21 +48,28 @@ const getInventory = async (req, res) => {
       console.log(list_products)
       
     }) */
+    console.log(products)
 
     for (let i = 0; i < category.length; i++) {
-     
       products.push(
         await pool.query('SELECT * FROM product where id_category=?', [
           category[i].id,
         ])
-      ) 
-     
+      )
     }
-    
+    for (let i = 0; i < products.length; i++) {
+      for (let j = 0; j < products.length; j++) {
+        objectCategories = {
+          category_name: products[i][j],
+        }
+      }
+    }
+
     return res.status(200).json({
       inventory,
       category,
-      products
+      products,
+      objectCategories,
     })
   } catch (e) {
     console.error(e)

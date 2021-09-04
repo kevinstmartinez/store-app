@@ -19,9 +19,11 @@ CREATE TABLE store(
 );
 CREATE TABLE client(
     id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    id_store INT(11) NOT NULL,
     name VARCHAR(45),
     lastname VARCHAR(45),
-    phone INT(11)
+    phone INT(11),
+    FOREIGN KEY (id_store) references store(id)
 );
 CREATE TABLE sale(
     id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
@@ -68,6 +70,7 @@ CREATE TABLE product(
     FOREIGN KEY (id_supplier) references supplier(id)
 );
 CREATE TABLE sale_product(
+    id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
     id_product INT(11) NOT NULL,
     id_sale INT(11) NOT NULL,
     quantity_sale INT(11) NOT NULL,
@@ -80,14 +83,23 @@ CREATE TABLE sale_product(
 CREATE TABLE sale(
     id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
     date_sale date,
-    quantity INT(11) NOT NULL,
+    id_client INT(11) NOT NULL,
+    id_store INT(11) NOT NULL, 
     status BOOLEAN,
     description VARCHAR(45),
-    price_sale DOUBLE NOT NULL,
+       FOREIGN KEY (id_client) references client (id),
+       FOREIGN KEY (id_store) references store (id)
+
+);
+
+CREATE TABLE sale_debt(
+    id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
     id_product INT(11) NOT NULL,
-    id_client INT(11) NOT NULL,
-    FOREIGN KEY (id_client) references client (id),
-    FOREIGN KEY (id_product) references product (id)
+    id_sale INT(11) NOT NULL,
+    quantity_sale INT(11) NOT NULL,
+    price_sale DOUBLE NOT NULL,
+    FOREIGN KEY (id_product) references product (id),
+    FOREIGN KEY (id_sale) references sale (id)
 );
 
 INSERT INTO role values(1, 'admin');
