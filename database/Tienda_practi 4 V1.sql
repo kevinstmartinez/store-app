@@ -104,3 +104,7 @@ CREATE TABLE sale_debt(
 INSERT INTO role values(1, 'admin');
 INSERT INTO role values(2, 'seller');
 INSERT INTO role values(3, 'support');
+
+
+ALTER TABLE sale ADD COLUMN total_sale DOUBLE;
+ALTER TABLE sale ADD COLUMN total_debt DOUBLE;

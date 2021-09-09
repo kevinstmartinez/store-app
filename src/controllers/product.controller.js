@@ -36,9 +36,9 @@ const createProducts = async (req, res) => {
       'SELECT * FROM supplier WHERE id_store=?',
       [decoded.id]
     )
-
+    console.log(parseInt( '770' + generateBarCode()))
     const create_product = await pool.query('INSERT INTO product SET?', {
-      barcode,
+      barcode: '770' + generateBarCode(),
       expiration_date: date,
       id_category,
       id_supplier: supplier[0].id,
@@ -58,6 +58,7 @@ const createProducts = async (req, res) => {
       create_product,
     })
   } catch (e) {
+    console.log(e)
     return res.status(400).json({
       message: 'Failed',
     })
@@ -73,5 +74,12 @@ const getPhoto = async (req, res) => {
    })
 }
 
+const generateBarCode = () =>{
+  let num = ''
+  while (num.length < 10) {
+      num += Math.floor(Math.random() * 10)
+  }
+  return num
+}
  
 module.exports = { createProducts, getPhoto }
