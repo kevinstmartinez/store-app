@@ -11,6 +11,11 @@ import getPhoto from './routes/products.routes'
 import createClient from './routes/client.routes'
 import createSale from './routes/sale.routes'
 import createDebtSale from './routes/sale.routes'
+import createSaleProduct from './routes/sale.routes'
+import getSales from './routes/sale.routes'
+import getDebts from './routes/sale.routes'
+import payDebt from './routes/sale.routes'
+
 
 const app = express()
 const session = require('express-session')
@@ -35,7 +40,12 @@ app.use('/client', createClient)
 app.use('/products', getPhoto)
 app.use('/api/sales/', createSale)
 app.use('/api/sales/', createDebtSale)
+app.use('/api/sales/', createSaleProduct)
+app.use('/api/sales/', payDebt)
 app.use('/api/inventory', getInventory)
+app.use('/api/sales/', getSales)
+app.use('/api/sales/', getDebts)
+
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`)
