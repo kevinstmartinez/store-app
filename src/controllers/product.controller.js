@@ -45,6 +45,7 @@ const createProducts = async (req, res) => {
       image: req.file.filename,
       name,
       quantity,
+      stock:quantity,
       unit_cost,
       unit_price,
     })
