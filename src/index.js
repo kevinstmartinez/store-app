@@ -15,6 +15,7 @@ import createSaleProduct from './routes/sale.routes'
 import getSales from './routes/sale.routes'
 import getDebts from './routes/sale.routes'
 import payDebt from './routes/sale.routes'
+import getUtilities from './routes/utilities.routes'
 
 
 const app = express()
@@ -45,6 +46,7 @@ app.use('/api/sales/', payDebt)
 app.use('/api/inventory', getInventory)
 app.use('/api/sales/', getSales)
 app.use('/api/sales/', getDebts)
+app.use('/api/balance/',getUtilities)
 
 
 app.listen(port, () => {

@@ -85,13 +85,13 @@ const createSaleProduct = async (req, res) => {
         if (products[i][j].id_category === product[0].id_category) {
           if (products[i][j].id === product[0].id) {
             console.log(
-              (descount_quantity = products[i][j].quantity - quantity_sale)
+              (descount_quantity = products[i][j].stock - quantity_sale)
             )
             console.log(
               (price_sale = products[i][j].unit_price * quantity_sale)
             )
 
-            await pool.query('UPDATE product set quantity=? WHERE id=?', [
+            await pool.query('UPDATE product set stock=? WHERE id=?', [
               descount_quantity,
               id_product,
             ])
@@ -179,7 +179,7 @@ const createDebtSale = async (req, res) => {
         if (products[i][j].id_category === product[0].id_category) {
           if (products[i][j].id === product[0].id) {
             console.log(
-              (descount_quantity = products[i][j].quantity - quantity_sale)
+              (descount_quantity = products[i][j].stock - quantity_sale)
             )
             console.log(
               (price_sale = products[i][j].unit_price * quantity_sale)
@@ -196,7 +196,7 @@ const createDebtSale = async (req, res) => {
               req.session.id_sale,
             ])
 
-            await pool.query('UPDATE product set quantity=? WHERE id=?', [
+            await pool.query('UPDATE product set stock=? WHERE id=?', [
               descount_quantity,
               id_product,
             ])
