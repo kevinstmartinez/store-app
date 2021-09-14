@@ -16,6 +16,7 @@ import getSales from './routes/sale.routes'
 import getDebts from './routes/sale.routes'
 import payDebt from './routes/sale.routes'
 import getUtilities from './routes/utilities.routes'
+import getClient from './routes/client.routes'
 
 
 const app = express()
@@ -38,6 +39,7 @@ app.use('/inventory', createCategory)
 app.use('/supplier', creatSupplier)
 app.use('/products', createProducts)
 app.use('/client', createClient)
+app.use('/client',getClient)
 app.use('/products', getPhoto)
 app.use('/api/sales/', createSale)
 app.use('/api/sales/', createDebtSale)
