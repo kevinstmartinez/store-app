@@ -8,29 +8,45 @@ const createSale = async (req, res) => {
     const token = req.headers.authorization
     const decoded = jwt_decode(token.slice(7, -1))
     console.log(decoded)
-    await pool.query(
-      'INSERT INTO sale SET ?',
-      {
-        date_sale: date,
-        id_client,
-        id_store: decoded.id,
-        status,
-        description,
-        total_sale: 0,
-        total_debt: 0,
-      },
-      function (error, results, fields) {
-        if (error) {
-          console.log(error)
-        } else {
-          console.log(results.insertId)
-          req.session.id_sale = results.insertId
-          return res.status(200).json({
-            message: 'sale register successfully',
-          })
-        }
+
+    const client = await pool.query('SELECT * FROM client WHERE id_store=?', [
+      decoded.id,
+    ])
+
+    console.log(client)
+
+    for (let i = 0; i < client.length; i++) {
+      console.log(client[i])
+      if (client[i].id == id_client) {
+        await pool.query(
+          'INSERT INTO sale SET ?',
+          {
+            date_sale: date,
+            id_client,
+            id_store: decoded.id,
+            status,
+            description,
+            total_sale: 0,
+            total_debt: 0,
+          },
+          function (error, results, fields) {
+            if (error) {
+              console.log(error)
+            } else {
+              console.log(results.insertId)
+              req.session.id_sale = results.insertId
+              return res.status(200).json({
+                message: 'sale register successfully',
+              })
+            }
+          }
+        )
+      } else {
+        return res.status(200).json({
+          message: 'client not found in the store',
+        })
       }
-    )
+    }
   } catch (e) {
     console.error(e)
   }
@@ -66,7 +82,6 @@ const createSaleProduct = async (req, res) => {
         ])
       )
     }
-    console.log(products[0][1])
 
     for (let i = 0; i < products.length; i++) {
       for (let j = 0; j < products[i].length; j++) {
@@ -84,39 +99,45 @@ const createSaleProduct = async (req, res) => {
         )
         if (products[i][j].id_category === product[0].id_category) {
           if (products[i][j].id === product[0].id) {
-            console.log(
-              (descount_quantity = products[i][j].stock - quantity_sale)
-            )
-            console.log(
-              (price_sale = products[i][j].unit_price * quantity_sale)
-            )
+            if (products[i][j].stock >= quantity_sale) {
+              console.log(
+                (descount_quantity = products[i][j].stock - quantity_sale)
+              )
+              console.log(
+                (price_sale = products[i][j].unit_price * quantity_sale)
+              )
 
-            await pool.query('UPDATE product set stock=? WHERE id=?', [
-              descount_quantity,
-              id_product,
-            ])
+              await pool.query('UPDATE product set stock=? WHERE id=?', [
+                descount_quantity,
+                id_product,
+              ])
 
-            const total = await pool.query(
-              'SELECT total_sale FROM sale WHERE id=?',
-              [req.session.id_sale]
-            )
-            total_sale += total[0].total_sale + price_sale
+              const total = await pool.query(
+                'SELECT total_sale FROM sale WHERE id=?',
+                [req.session.id_sale]
+              )
+              total_sale += total[0].total_sale + price_sale
 
-            await pool.query('UPDATE sale set total_sale=? WHERE id=?', [
-              total_sale,
-              req.session.id_sale,
-            ])
+              await pool.query('UPDATE sale set total_sale=? WHERE id=?', [
+                total_sale,
+                req.session.id_sale,
+              ])
 
-            await pool.query('INSERT INTO sale_product SET ?', {
-              id_sale: req.session.id_sale,
-              id_product,
-              quantity_sale,
-              price_sale,
-            })
+              await pool.query('INSERT INTO sale_product SET ?', {
+                id_sale: req.session.id_sale,
+                id_product,
+                quantity_sale,
+                price_sale,
+              })
 
-            return res.status(200).json({
-              message: 'Sale register successfully',
-            })
+              return res.status(200).json({
+                message: 'Sale register successfully',
+              })
+            } else {
+              return res.status(200).json({
+                message: 'No stock availabel',
+              })
+            }
           }
         }
         console.log('no existe')
@@ -231,56 +252,51 @@ const payDebt = async (req, res) => {
       'SELECT total_debt, total_sale FROM sale WHERE id=?',
       [id_debt]
     )
-       const total_debt_init = await pool.query(
-         'SELECT total_debt FROM sale WHERE id=?',
-         [id_debt]
-       )
+    const total_debt_init = await pool.query(
+      'SELECT total_debt FROM sale WHERE id=?',
+      [id_debt]
+    )
 
-    if(total_debt_init[0].total_debt==0){
+    if (total_debt_init[0].total_debt == 0) {
       res.status(200).json({
         message: 'Deuda pagada',
       })
+    } else {
+      console.log('sale actually:', debt)
 
+      let currentTotalSale = debt[0].total_debt - payment
+      let pay = payment + debt[0].total_sale
+      console.log('payment:', pay)
+      console.log('currentTstate:', currentTotalSale)
 
-    }else{
+      await pool.query(
+        'UPDATE sale SET total_sale=?, total_debt=? WHERE id=?',
+        [pay, currentTotalSale, id_debt]
+      )
 
-       console.log("sale actually:",debt)
+      const sale_updated = await pool.query(
+        'SELECT total_debt, total_sale FROM sale WHERE id=?',
+        [id_debt]
+      )
+      const total_debt = await pool.query(
+        'SELECT total_debt FROM sale WHERE id=?',
+        [id_debt]
+      )
 
-    let currentTotalSale = debt[0].total_debt - payment
-    let pay = payment + debt[0].total_sale
-    console.log("payment:",pay)
-    console.log("currentTstate:",currentTotalSale)
+      console.log('total_debt:', total_debt[0].total_debt)
+      console.log('sale_update:', sale_updated)
+      //console.log("debt:",debt[0].total_debt)
+      //  await pool.query('UPDATE sale SET status=1 WHERE id=?', [id_debt])
 
-    await pool.query('UPDATE sale SET total_sale=?, total_debt=? WHERE id=?', [
-      pay,
-      currentTotalSale,
-      id_debt,
-    ])
-
-    const sale_updated =await pool.query('SELECT total_debt, total_sale FROM sale WHERE id=?',[id_debt])
-    const total_debt =await pool.query('SELECT total_debt FROM sale WHERE id=?',[id_debt])
-
-    console.log("total_debt:",total_debt[0].total_debt)
-    console.log("sale_update:",sale_updated)
-    //console.log("debt:",debt[0].total_debt)
-  //  await pool.query('UPDATE sale SET status=1 WHERE id=?', [id_debt])
-
-    total_debt[0].total_debt === 0
-      ? (await pool.query('UPDATE sale SET status=1 WHERE id=?', [id_debt]),
-        res.status(200).json({
-          message: 'Deuda pagada',
-        })) : (
-            res.status(200).json({
-              message: 'Seguir pagando'
-            })
-
-        )
-      
+      total_debt[0].total_debt === 0
+        ? (await pool.query('UPDATE sale SET status=1 WHERE id=?', [id_debt]),
+          res.status(200).json({
+            message: 'Deuda pagada',
+          }))
+        : res.status(200).json({
+            message: 'Seguir pagando',
+          })
     }
-    
-   
-
-   
   } catch (error) {
     console.log(error)
   }

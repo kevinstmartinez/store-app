@@ -36,4 +36,31 @@ const createClient = async (req, res) => {
     console.error(e)
   }
 }
-module.exports = createClient
+
+
+const getClient = async( req,res)=>{
+
+  try {
+     const token = req.headers.authorization
+     const decoded = jwt_decode(token.slice(7, -1))
+
+     console.log(decoded)
+     const client = await pool.query('SELECT * FROM client WHERE id_store=?', [
+       decoded.id,
+     ])
+
+
+    return res.status(200).json({
+      message: 'Clientes',
+      client
+    })
+    
+  } catch (e) {
+    console.error(e)
+  }
+
+
+
+
+}
+module.exports = {createClient,getClient}
