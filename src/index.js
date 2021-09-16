@@ -17,6 +17,7 @@ import getDebts from './routes/sale.routes'
 import payDebt from './routes/sale.routes'
 import getUtilities from './routes/utilities.routes'
 import getClient from './routes/client.routes'
+import createReport from './routes/report.routes'
 
 
 const app = express()
@@ -49,7 +50,7 @@ app.use('/api/inventory', getInventory)
 app.use('/api/sales/', getSales)
 app.use('/api/sales/', getDebts)
 app.use('/api/balance/',getUtilities)
-
+app.use('/api/report', createReport)
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`)
