@@ -19,7 +19,7 @@ const getUtilities = async (req, res) => {
       [inventory[0].id]
     )
 
-    console.log(products)
+  
 
     for (let i = 0; i < category.length; i++) {
       products.push(
@@ -31,13 +31,7 @@ const getUtilities = async (req, res) => {
 
     for (let i = 0; i < products.length; i++) {
       for (let j = 0; j < products[i].length; j++) {
-        console.log('Nombre:', products[i][j].name)
-        console.log('Producto costo unitario:', products[i][j].unit_cost)
-        console.log('Cantidad de producto:', products[i][j].quantity)
-        console.log(
-          ' Costo de venta :',
-          products[i][j].unit_cost * products[i][j].quantity
-        )
+     
 
         totalExpense += products[i][j].unit_cost * products[i][j].quantity
       }
@@ -53,19 +47,16 @@ const getUtilities = async (req, res) => {
     }
     grossIncome = totalSale -totalExpense
     marginGrossIncome = ( grossIncome / totalSale ) * 100
-    
-    return res.status(200).json({
-      products,
-      totalExpense,
-      totalSale,
+    const obj = {
       grossIncome,
       marginGrossIncome
-    })
+    }
+    
+    return (res.status(200).json(obj))
   } catch (e) {
     console.error(e)
   }
 }
 
-const getCostAndExpenses = (req, res) => {}
 
 module.exports = getUtilities
