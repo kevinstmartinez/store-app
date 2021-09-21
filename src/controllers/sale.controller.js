@@ -41,11 +41,7 @@ const createSale = async (req, res) => {
             }
           }
         )
-      } else {
-        return res.status(200).json({
-          message: 'client not found in the store',
-        })
-      }
+      } 
     }
   } catch (e) {
     console.error(e)
