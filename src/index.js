@@ -20,6 +20,8 @@ import getClient from './routes/client.routes'
 import createReport from './routes/report.routes'
 import cors from 'cors'
 
+import { generateUploadURL } from './s3'
+
 let allowedOrigins = ['http://localhost:3000']
 
 const app = express()
@@ -69,6 +71,11 @@ app.use('/api/sales/', getSales)
 app.use('/api/sales/', getDebts)
 app.use('/api/balance/',getUtilities)
 app.use('/api/report', createReport)
+
+app.get('/s3Url', async (req, res) => {
+  const url = await generateUploadURL()
+  res.send({url})
+})
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`)
