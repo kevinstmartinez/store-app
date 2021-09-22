@@ -69,13 +69,13 @@ CREATE TABLE product(
     FOREIGN KEY (id_category) references category(id),
     FOREIGN KEY (id_supplier) references supplier(id)
 );
+
 CREATE TABLE sale_product(
     id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
     id_product INT(11) NOT NULL,
     id_sale INT(11) NOT NULL,
     quantity_sale INT(11) NOT NULL,
     price_sale DOUBLE NOT NULL,
-    PRIMARY KEY (id_product,id_sale),
     FOREIGN KEY (id_product) references product (id),
     FOREIGN KEY (id_sale) references sale (id)
 );
@@ -87,9 +87,8 @@ CREATE TABLE sale(
     id_store INT(11) NOT NULL, 
     status BOOLEAN,
     description VARCHAR(45),
-       FOREIGN KEY (id_client) references client (id),
-       FOREIGN KEY (id_store) references store (id)
-
+    FOREIGN KEY (id_client) references client (id),
+    FOREIGN KEY (id_store) references store (id)
 );
 
 CREATE TABLE sale_debt(
