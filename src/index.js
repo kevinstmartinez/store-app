@@ -18,11 +18,14 @@ import payDebt from './routes/sale.routes'
 import getUtilities from './routes/utilities.routes'
 import getClient from './routes/client.routes'
 import createReport from './routes/report.routes'
+import cors from 'cors'
 
+let allowedOrigins = ['http://localhost:3000']
 
 const app = express()
 const session = require('express-session')
 const port = 4000 || process.env.PORT
+
 app.use(
   session({
     secret: 'mykey',
@@ -30,7 +33,22 @@ app.use(
     resave: false,
   })
 )
+
 app.use(morgan('dev'))
+
+app.use(cors({
+  origin: function(origin, callback){
+
+    if(!origin) return callback(null, true);
+    if(allowedOrigins.indexOf(origin) === -1){
+      var msg = 'The CORS policy for this site does not ' +
+                'allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  }
+}))
+
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 app.use(require('./routes'))
