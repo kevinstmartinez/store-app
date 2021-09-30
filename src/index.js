@@ -1,6 +1,7 @@
 import express from 'express'
 import morgan from 'morgan'
 
+import getSupplier from './routes/supplier.routes'
 import register from './routes/authentication.routes'
 import login from './routes/authentication.routes'
 import createCategory from './routes/inventory.routes'
@@ -71,6 +72,7 @@ app.use('/api/sales/', getSales)
 app.use('/api/sales/', getDebts)
 app.use('/api/balance/',getUtilities)
 app.use('/api/report', createReport)
+app.use('/api/supplier', getSupplier)
 
 app.get('/s3Url', async (req, res) => {
   const url = await generateUploadURL()
