@@ -39,4 +39,16 @@ const createSupplier = async (req, res) => {
   }
 }
 
-module.exports = createSupplier
+const getSupplier = async(req, res) =>{
+  try {
+    const token = req.headers.authorization
+    const decoded = jwt_decode(token.slice(7, -1))
+    console.log(decoded.id)
+    const suppliers = await pool.query('SELECT * FROM supplier WHERE id_store=?',[decoded.id])
+    res.status(200).json({ suppliers })
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+module.exports = {createSupplier, getSupplier}

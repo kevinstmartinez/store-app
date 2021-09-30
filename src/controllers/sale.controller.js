@@ -10,14 +10,19 @@ const createSale = async (req, res) => {
     console.log(decoded)
 
     const client = await pool.query('SELECT * FROM client WHERE id_store=?', [
-      decoded.id,
+      decoded.id
     ])
 
     console.log(client)
 
+    client.filter(c =>{
+      if(c.id === id_client) console.log('bien')
+      console.log('mal')
+    })
+
     for (let i = 0; i < client.length; i++) {
       console.log(client[i])
-      if (client[i].id == id_client) {
+      if (client[i].id === id_client) {
         await pool.query(
           'INSERT INTO sale SET ?',
           {
@@ -294,8 +299,8 @@ const payDebt = async (req, res) => {
             message: 'Deuda pagada',
           }))
         : res.status(200).json({
-            message: 'Seguir pagando',
-          })
+          message: 'Seguir pagando',
+        })
     }
   } catch (error) {
     console.log(error)
