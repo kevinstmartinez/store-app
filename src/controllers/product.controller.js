@@ -42,7 +42,7 @@ const createProducts = async (req, res) => {
       expiration_date: date,
       id_category,
       id_supplier: supplier[0].id,
-      image: req.file.filename,
+      image,
       name,
       quantity,
       stock:quantity,
