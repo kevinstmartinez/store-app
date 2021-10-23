@@ -5,6 +5,7 @@ import register from './routes/authentication.routes'
 import login from './routes/authentication.routes'
 import createCategory from './routes/inventory.routes'
 import getInventory from './routes/inventory.routes'
+import getSupplier from './routes/supplier.routes'
 import creatSupplier from './routes/supplier.routes'
 import createProducts from './routes/products.routes'
 import getPhoto from './routes/products.routes'
@@ -58,6 +59,7 @@ app.use('/auth', register)
 app.use('/auth', login)
 app.use('/inventory', createCategory)
 app.use('/supplier', creatSupplier)
+app.use('/api/supplier', getSupplier)
 app.use('/products', createProducts)
 app.use('/client', createClient)
 app.use('/client',getClient)
