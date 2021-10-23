@@ -72,7 +72,7 @@ app.use('/api/sales/', getSales)
 app.use('/api/sales/', getDebts)
 app.use('/api/balance/',getUtilities)
 app.use('/api/report', createReport)
-app.use('/api/supplier', getSupplier)
+app.use('/api/supplier', getSupplier) 
 
 app.get('/s3Url', async (req, res) => {
   const url = await generateUploadURL()
