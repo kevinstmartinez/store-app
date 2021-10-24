@@ -298,6 +298,7 @@ const payDebt = async (req, res) => {
   }
 }
 const getSales = async (req, res) => {
+  let clients= []
   try {
     const token = req.headers.authorization
     const decoded = jwt_decode(token.slice(7, -1))
@@ -305,13 +306,25 @@ const getSales = async (req, res) => {
       'SELECT * FROM sale WHERE id_store=? AND total_debt=0',
       [decoded.id]
     )
+    for (let index = 0; index < sale.length; ++index) {
+      const cli = await pool.query('SELECT * FROM client WHERE id=?', sale[index].id_client)
+      clients.push(cli)
+    }
+    let arr =[]
+    clients.map(index =>{
+      index.map(jotax =>{
+        arr.push({id: jotax.id, name:jotax.name, lastname:jotax.lastname, phone:jotax.phone})
+      })
+    })
 
-    return res.status(200).json({ sales: sale })
+    return res.status(200).json({ sales: sale, clients:arr })
   } catch (error) {
     console.log(error)
   }
 }
 const getDebts = async (req, res) => {
+  let clients= []
+
   try {
     const token = req.headers.authorization
     const decoded = jwt_decode(token.slice(7, -1))
@@ -319,8 +332,18 @@ const getDebts = async (req, res) => {
       'SELECT * FROM sale WHERE id_store=? AND total_debt>0',
       [decoded.id]
     )
+    for (let index = 0; index < debt.length; ++index) {
+      const cli = await pool.query('SELECT * FROM client WHERE id=?', debt[index].id_client)
+      clients.push(cli)
+    }
+    let arr =[]
+    clients.map(index =>{
+      index.map(jotax =>{
+        arr.push({id: jotax.id, name:jotax.name, lastname:jotax.lastname, phone:jotax.phone})
+      })
+    })
 
-    return res.status(200).json({ Debt: debt })
+    return res.status(200).json({ Debt: debt, clients:arr })
   } catch (error) {
     console.log(error)
   }
