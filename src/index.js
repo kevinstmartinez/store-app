@@ -1,5 +1,6 @@
 import express from 'express'
 import morgan from 'morgan'
+import cookieParser from 'cookie-parser'
 
 import getSupplier from './routes/supplier.routes'
 import register from './routes/authentication.routes'
@@ -20,6 +21,10 @@ import getUtilities from './routes/utilities.routes'
 import getClient from './routes/client.routes'
 import createReport from './routes/report.routes'
 import cors from 'cors'
+import MySQLStore from 'express-mysql-session'
+
+
+const sessionStore = new MySQLStore({host:process.env.DB_HOST, port: 3306, user:process.env.DB_USER, password:process.env.DB_PASSWORD, database:process.env.DB_DATABASE})
 
 import { generateUploadURL } from './s3'
 
@@ -29,11 +34,13 @@ const app = express()
 const session = require('express-session')
 const port = 4000 || process.env.PORT
 
+app.use(cookieParser())
 app.use(
   session({
     secret: 'mykey',
     saveUninitialized: false,
     resave: false,
+    store: sessionStore
   })
 )
 

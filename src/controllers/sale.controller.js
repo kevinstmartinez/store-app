@@ -29,11 +29,12 @@ const createSale = async (req, res) => {
             total_sale: 0,
             total_debt: 0,
           },
-          function (error, results, fields) {
+          async function  (error, results, fields) {
             if (error) {
               console.log(error)
             } else {
               console.log(results.insertId)
+              await pool.query('TRUNCATE TABLE sessions')
               req.session.id_sale = results.insertId
               return res.status(200).json({
                 message: 'sale register successfully',
@@ -66,6 +67,9 @@ const createSaleProduct = async (req, res) => {
       'SELECT * FROM inventory WHERE id_store=?',
       [decoded.id]
     )
+    const idSession = await pool.query('SELECT data FROM sessions')
+    let idSessionSale = JSON.parse(idSession[0].data)
+
     const category = await pool.query(
       'SELECT * FROM category WHERE id_inventory=?',
       [inventory[0].id]
@@ -110,17 +114,17 @@ const createSaleProduct = async (req, res) => {
 
               const total = await pool.query(
                 'SELECT total_sale FROM sale WHERE id=?',
-                [req.session.id_sale]
+                [idSessionSale.id_sale]
               )
               total_sale += total[0].total_sale + price_sale
 
               await pool.query('UPDATE sale set total_sale=? WHERE id=?', [
                 total_sale,
-                req.session.id_sale,
+                idSessionSale.id_sale,
               ])
 
               await pool.query('INSERT INTO sale_product SET ?', {
-                id_sale: req.session.id_sale,
+                id_sale: idSessionSale.id_sale,
                 id_product,
                 quantity_sale,
                 price_sale,
@@ -161,6 +165,9 @@ const createDebtSale = async (req, res) => {
 
     const token = req.headers.authorization
     const decoded = jwt_decode(token.slice(7, -1))
+    const idSession = await pool.query('SELECT data FROM sessions')
+    let idSessionSale = JSON.parse(idSession[0].data)
+
     const inventory = await pool.query(
       'SELECT * FROM inventory WHERE id_store=?',
       [decoded.id]
@@ -204,13 +211,13 @@ const createDebtSale = async (req, res) => {
 
             const total = await pool.query(
               'SELECT total_debt FROM sale WHERE id=?',
-              [req.session.id_sale]
+              [idSessionSale.id_sale]
             )
             total_debt += total[0].total_debt + price_sale
 
             await pool.query('UPDATE sale set total_debt=? WHERE id=?', [
               total_debt,
-              req.session.id_sale,
+              idSessionSale.id_sale,
             ])
 
             await pool.query('UPDATE product set stock=? WHERE id=?', [
@@ -219,7 +226,7 @@ const createDebtSale = async (req, res) => {
             ])
 
             await pool.query('INSERT INTO sale_debt SET ?', {
-              id_sale: req.session.id_sale,
+              id_sale: idSessionSale.id_sale,
               id_product,
               quantity_sale,
               price_sale,
@@ -243,6 +250,7 @@ const createDebtSale = async (req, res) => {
 
 const payDebt = async (req, res) => {
   const { id_debt, payment } = req.body
+  let now = new Date
   try {
     const debt = await pool.query(
       'SELECT total_debt, total_sale FROM sale WHERE id=?',
@@ -259,12 +267,13 @@ const payDebt = async (req, res) => {
       })
     } else {
       console.log('sale actually:', debt)
-
+      
       let currentTotalSale = debt[0].total_debt - payment
       let pay = payment + debt[0].total_sale
       console.log('payment:', pay)
       console.log('currentTstate:', currentTotalSale)
-
+      
+      await pool.query('UPDATE sale SET date_sale = ? WHERE id=?', [now, id_debt ])
       await pool.query(
         'UPDATE sale SET total_sale=?, total_debt=? WHERE id=?',
         [pay, currentTotalSale, id_debt]
