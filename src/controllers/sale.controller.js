@@ -260,6 +260,7 @@ const payDebt = async (req, res) => {
       'SELECT total_debt FROM sale WHERE id=?',
       [id_debt]
     )
+    if (payment > total_debt_init[0].total_debt) return res.status(203).json({message: 'El pago no corresponde al monto de la deuda'})
 
     if (total_debt_init[0].total_debt == 0) {
       res.status(200).json({
@@ -287,7 +288,7 @@ const payDebt = async (req, res) => {
         'SELECT total_debt FROM sale WHERE id=?',
         [id_debt]
       )
-
+      
       console.log('total_debt:', total_debt[0].total_debt)
       console.log('sale_update:', sale_updated)
       //console.log("debt:",debt[0].total_debt)
