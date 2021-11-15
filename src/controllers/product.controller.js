@@ -115,7 +115,7 @@ const updateProduct = async (req, res) => {
 
 const getShopCar = async (req, res) => {
   let car = []
-  try {
+ 
     const idSession = await pool.query('SELECT data FROM sessions')
 
     let idSessionSale = JSON.parse(idSession[0].data)
@@ -125,45 +125,83 @@ const getShopCar = async (req, res) => {
       [idSessionSale.id_sale]
     )
     console.log(current_sale)
-    const current_sale_debt = await pool.query(
-      'SELECT * FROM sale_debt WHERE id_sale=?',
-      [idSessionSale.id_sale]
-    )
-    console.log(current_sale_debt)
 
-    for (let index = 0; index < current_sale.length; ++index) {
-      const cli = await pool.query(
-        'SELECT * FROM product WHERE id=?',
-        current_sale[index].id_product
+   for (let index = 0; index < current_sale.length; ++index) {
+     const cli = await pool.query(
+       'SELECT * FROM product WHERE id=?',
+       current_sale[index].id_product
+     )
+
+     cli.price_sale = current_sale[index].price_sale
+     cli.id_carproduct = current_sale[index].id
+     console.log('Actual_sale', cli)
+     car.push(cli)
+   }
+   let arr = []
+   car.map((index) => {
+     index.map((jotax) => {
+       arr.push({
+         id: jotax.id,
+         barcode: jotax.barcode,
+         image: jotax.image,
+         name: jotax.name,
+         expiration_date: jotax.expiration_date,
+         price_sale: index.price_sale,
+         id_carproduct: index.id_carproduct,
+         tipo: 1,
+       })
+     })
+   })
+   return res.status(200).json({
+     arr,
+   })
+
+}
+   const getShopCarDebt = async (req, res) => {
+    try{
+      let car = []
+
+      const idSession = await pool.query('SELECT data FROM sessions')
+      let idSessionSale = JSON.parse(idSession[0].data)
+      const current_sale_debt = await pool.query(
+        'SELECT * FROM sale_debt WHERE id_sale=?',
+        [idSessionSale.id_sale]
       )
+      console.log(current_sale_debt)
 
-      cli.price_sale = current_sale[index].price_sale
-      cli.id_carproduct = current_sale[index].id
-      console.log('Actual_sale', cli)
-      car.push(cli)
-    }
-    let arr = []
-    car.map((index) => {
-      index.map((jotax) => {
-        arr.push({
-          id: jotax.id,
-          barcode: jotax.barcode,
-          image: jotax.image,
-          name: jotax.name,
-          expiration_date: jotax.expiration_date,
-          price_sale: index.price_sale,
-          id_carproduct: index.id_carproduct,
-          tipo: 1,
-        })
-      })
-    })
-    return res.status(200).json({
-      arr,
-    })
+     for (let index = 0; index < current_sale_debt.length; ++index) {
+       const cli = await pool.query(
+         'SELECT * FROM product WHERE id=?',
+         current_sale_debt[index].id_product
+       )
+
+       cli.price_sale = current_sale_debt[index].price_sale
+       cli.id_carproduct = current_sale_debt[index].id
+       console.log('Actual_sale debt', cli)
+       car.push(cli)
+     }
+     let arr = []
+     car.map((index) => {
+       index.map((jotax) => {
+         arr.push({
+           id: jotax.id,
+           barcode: jotax.barcode,
+           image: jotax.image,
+           name: jotax.name,
+           expiration_date: jotax.expiration_date,
+           price_sale: index.price_sale,
+           id_carproduct: index.id_carproduct,
+           tipo: 0,
+         })
+       })
+     })
+     return res.status(200).json({
+       arr,
+     })
   } catch (error) {
     console.log(error)
     return res.status(400).json({})
   }
 }
 
-module.exports = { createProducts, getPhoto, getShopCar, updateProduct }
+module.exports = { createProducts, getPhoto, getShopCar, getShopCarDebt, updateProduct }
