@@ -29,7 +29,7 @@ const createSale = async (req, res) => {
             total_sale: 0,
             total_debt: 0,
           },
-          async function  (error, results, fields) {
+          async function (error, results, fields) {
             if (error) {
               console.log(error)
             } else {
@@ -42,7 +42,7 @@ const createSale = async (req, res) => {
             }
           }
         )
-      } 
+      }
     }
   } catch (e) {
     console.error(e)
@@ -250,7 +250,7 @@ const createDebtSale = async (req, res) => {
 
 const payDebt = async (req, res) => {
   const { id_debt, payment } = req.body
-  let now = new Date
+  let now = new Date()
   try {
     const debt = await pool.query(
       'SELECT total_debt, total_sale FROM sale WHERE id=?',
@@ -267,13 +267,16 @@ const payDebt = async (req, res) => {
       })
     } else {
       console.log('sale actually:', debt)
-      
+
       let currentTotalSale = debt[0].total_debt - payment
       let pay = payment + debt[0].total_sale
       console.log('payment:', pay)
       console.log('currentTstate:', currentTotalSale)
-      
-      await pool.query('UPDATE sale SET date_sale = ? WHERE id=?', [now, id_debt ])
+
+      await pool.query('UPDATE sale SET date_sale = ? WHERE id=?', [
+        now,
+        id_debt,
+      ])
       await pool.query(
         'UPDATE sale SET total_sale=?, total_debt=? WHERE id=?',
         [pay, currentTotalSale, id_debt]
@@ -307,7 +310,7 @@ const payDebt = async (req, res) => {
   }
 }
 const getSales = async (req, res) => {
-  let clients= []
+  let clients = []
   try {
     const token = req.headers.authorization
     const decoded = jwt_decode(token.slice(7, -1))
@@ -316,23 +319,31 @@ const getSales = async (req, res) => {
       [decoded.id]
     )
     for (let index = 0; index < sale.length; ++index) {
-      const cli = await pool.query('SELECT * FROM client WHERE id=?', sale[index].id_client)
+      const cli = await pool.query(
+        'SELECT * FROM client WHERE id=?',
+        sale[index].id_client
+      )
       clients.push(cli)
     }
-    let arr =[]
-    clients.map(index =>{
-      index.map(jotax =>{
-        arr.push({id: jotax.id, name:jotax.name, lastname:jotax.lastname, phone:jotax.phone})
+    let arr = []
+    clients.map((index) => {
+      index.map((jotax) => {
+        arr.push({
+          id: jotax.id,
+          name: jotax.name,
+          lastname: jotax.lastname,
+          phone: jotax.phone,
+        })
       })
     })
 
-    return res.status(200).json({ sales: sale, clients:arr })
+    return res.status(200).json({ sales: sale, clients: arr })
   } catch (error) {
     console.log(error)
   }
 }
 const getDebts = async (req, res) => {
-  let clients= []
+  let clients = []
 
   try {
     const token = req.headers.authorization
@@ -342,19 +353,176 @@ const getDebts = async (req, res) => {
       [decoded.id]
     )
     for (let index = 0; index < debt.length; ++index) {
-      const cli = await pool.query('SELECT * FROM client WHERE id=?', debt[index].id_client)
+      const cli = await pool.query(
+        'SELECT * FROM client WHERE id=?',
+        debt[index].id_client
+      )
       clients.push(cli)
     }
-    let arr =[]
-    clients.map(index =>{
-      index.map(jotax =>{
-        arr.push({id: jotax.id, name:jotax.name, lastname:jotax.lastname, phone:jotax.phone})
+    let arr = []
+    clients.map((index) => {
+      index.map((jotax) => {
+        arr.push({
+          id: jotax.id,
+          name: jotax.name,
+          lastname: jotax.lastname,
+          phone: jotax.phone,
+        })
       })
     })
 
-    return res.status(200).json({ Debt: debt, clients:arr })
+    return res.status(200).json({ Debt: debt, clients: arr })
   } catch (error) {
     console.log(error)
+  }
+}
+
+const getsale_Product = async (req, res) => {
+  try {
+    const { id } = req.params
+    const products = await pool.query(
+      'SELECT * FROM sale_product WHERE id_sale=?',
+      [id]
+    )
+    console.log(products)
+    return res.status(200).json({
+      products,
+    })
+  } catch (error) {
+    console.log(error)
+    return res.status(400).json({})
+  }
+}
+const getcurrent_Sale = async (req, res) => {
+  try {
+    const idSession = await pool.query('SELECT data FROM sessions')
+    let idSessionSale = JSON.parse(idSession[0].data)
+    const sale = await pool.query('SELECT * FROM sale WHERE id=?', [
+      idSessionSale.id_sale,
+    ])
+    let clients=[]
+    for (let index = 0; index < sale.length; ++index) {
+      const cli = await pool.query(
+        'SELECT * FROM client WHERE id=?',
+        sale[index].id_client
+      )
+      clients.push(cli)
+    }
+    let arr = []
+    clients.map((index) => {
+      index.map((jotax) => {
+        arr.push({
+          id: jotax.id,
+          name: jotax.name,
+          lastname: jotax.lastname,
+          phone: jotax.phone,
+        })
+      })
+    })
+
+    return res.status(200).json({ sales: sale, clients: arr })
+  } catch (error) {
+    console.log(error)
+    return res.status(400).json({})
+  }
+}
+
+const delete_sale_product = async (req, res) => {
+  try {
+    const { id } = req.params
+    console.log(req.params.id)
+    const idSession = await pool.query('SELECT data FROM sessions')
+
+    let idSessionSale = JSON.parse(idSession[0].data)
+
+    const total_sale = await pool.query(
+      'SELECT total_sale FROM sale WHERE id=?',
+      [idSessionSale.id_sale]
+    )
+    console.log(total_sale)
+
+    const price_products = await pool.query(
+      'SELECT price_sale FROM sale_product WHERE id=?',
+      [id]
+    )
+
+    let grand_total = total_sale[0].total_sale - price_products[0].price_sale
+
+    await pool.query('UPDATE sale SET total_sale=? where id=?', [
+      grand_total,
+      idSessionSale.id_sale,
+    ])
+
+    await pool.query('DELETE FROM sale_product where id=?', [id])
+
+    const current_total_sale = await pool.query(
+      'SELECT total_sale FROM sale WHERE id=?',
+      [idSessionSale.id_sale]
+    )
+
+    /*  const products = await pool.query('DELETE FROM sale_product WHERE id=?', [
+      id_sale_product,
+    ]) */
+
+    /* console.log(products) */
+    return res.status(200).json({
+      total_sale,
+      price_products,
+      grand_total,
+      current_total_sale,
+    })
+  } catch (error) {
+    console.log(error)
+    return res.status(400).json({})
+  }
+}
+
+const delete_debt_product = async (req, res) => {
+  try {
+    const { id } = req.params
+    console.log(req.params.id)
+    const idSession = await pool.query('SELECT data FROM sessions')
+
+    let idSessionSale = JSON.parse(idSession[0].data)
+
+    const total_debt = await pool.query(
+      'SELECT total_debt FROM sale WHERE id=?',
+      [idSessionSale.id_sale]
+    )
+
+    const price_products = await pool.query(
+      'SELECT price_sale FROM sale_debt WHERE id=?',
+      [id]
+    )
+
+    let grand_total = total_debt[0].total_debt - price_products[0].price_sale
+
+    await pool.query('UPDATE sale SET total_debt=? where id=?', [
+      grand_total,
+      idSessionSale.id_sale,
+    ])
+
+    await pool.query('DELETE FROM sale_debt where id=?', [id])
+
+    const current_total_sale = await pool.query(
+      'SELECT total_debt FROM sale WHERE id=?',
+      [idSessionSale.id_sale]
+    )
+
+    /*  const products = await pool.query('DELETE FROM sale_product WHERE id=?', [
+      id_sale_product,
+    ]) */
+
+    /* console.log(products) */
+    return res.status(200).json({
+      total_debt,
+      price_products,
+      grand_total,
+      current_total_sale,
+    })
+  } catch (error) {
+    console.log(error)
+    return res.status(400).json({})
   }
 }
 
@@ -365,4 +533,8 @@ module.exports = {
   getSales,
   getDebts,
   payDebt,
+  getsale_Product,
+  delete_sale_product,
+  delete_debt_product,
+  getcurrent_Sale,
 }

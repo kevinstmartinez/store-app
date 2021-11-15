@@ -4,7 +4,8 @@ import pdf from 'pdfkit'
 import fs from 'fs'
 import moment from 'moment'
 import axios from 'axios'
-
+import express from 'express'
+const router = express.Router()
 const createReport = async (req, res) => {
   let doc = new pdf({ margin: 50 })
   let dataUtilities
@@ -28,13 +29,22 @@ const createReport = async (req, res) => {
     }
     createReport(report, path)
     async function createReport(report, path) {
-      await generateHeader(doc)
-      generateCustomerInformation(doc, report)
-      await generateReporTable(doc, report)
-      await generateFooter(doc)
+      try {
+        await generateHeader(doc)
+        generateCustomerInformation(doc, report)
+        await generateReporTable(doc, report)
+        await generateFooter(doc)
 
-      doc.end()
-      doc.pipe(fs.createWriteStream(path))
+        doc.pipe(fs.createWriteStream(path)) // write to PDF
+        doc.pipe(res)
+        doc.fontSize(25).text('text', 100, 100)
+        doc.end()
+        return res
+          .status(200)
+          .json({ path: 'C:/Users/Yulian/Desktop/report.pdf' })
+      } catch (error) {
+        console.log(error)
+      }
     }
     async function generateHeader(doc) {
       const token = req.headers.authorization
