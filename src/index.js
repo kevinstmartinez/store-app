@@ -20,6 +20,7 @@ import payDebt from './routes/sale.routes'
 import getUtilities from './routes/utilities.routes'
 import getClient from './routes/client.routes'
 import createReport from './routes/report.routes'
+import updateProduct from './routes/products.routes'
 import cors from 'cors'
 import MySQLStore from 'express-mysql-session'
 
@@ -70,6 +71,7 @@ app.use('/products', createProducts)
 app.use('/client', createClient)
 app.use('/client',getClient)
 app.use('/products', getPhoto)
+app.use('/api/products', updateProduct)
 app.use('/api/sales/', createSale)
 app.use('/api/sales/', createDebtSale)
 app.use('/api/sales/', createSaleProduct)

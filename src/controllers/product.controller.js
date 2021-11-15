@@ -1,5 +1,7 @@
 import pool from '../database'
 import jwt_decode from 'jwt-decode'
+import { get } from '../routes'
+
 
 const createProducts = async (req, res) => {
   const {
@@ -82,6 +84,35 @@ const generateBarCode = () => {
   return num
 }
 
+const updateProduct = async (req, res) => {
+  const { id } = req.params
+  const {
+    expiration_date,
+    image,
+    name,
+    quantity,
+    unit_cost,
+    unit_price,
+  } = req.body
+
+  try {
+    const token = req.headers.authorization
+    const decoded = jwt_decode(token.slice(7, -1))
+
+    console.log(decoded)
+    const getProductId = await pool.query('SELECT * FROM product WHERE id=?', [id])
+    console.log(getProductId[0])
+
+    const newProduct = { id:getProductId[0].id, barcode:getProductId[0].barcode, image: getProductId[0].image, expiration_date:getProductId[0].expiration_date,  name, quantity: getProductId[0].quantity += quantity, unit_cost, unit_price, id_category: getProductId[0].id_category, id_supplier: getProductId[0].id_supplier, stock: getProductId[0].stock += quantity }
+    
+   await pool.query('UPDATE product SET ? WHERE id=?', [newProduct, id])
+    
+    return res.status(201).json({ message: 'Product updated successfully' })
+  } catch (e) {
+    console.log(e)
+  }
+}
+
 const getShopCar = async (req, res) => {
   let car = []
   try {
@@ -135,4 +166,4 @@ const getShopCar = async (req, res) => {
   }
 }
 
-module.exports = { createProducts, getPhoto, getShopCar }
+module.exports = { createProducts, getPhoto, getShopCar, updateProduct }
