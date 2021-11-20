@@ -204,4 +204,22 @@ const getShopCar = async (req, res) => {
   }
 }
 
-module.exports = { createProducts, getPhoto, getShopCar, getShopCarDebt, updateProduct }
+const getMostSaleProduct = async(req, res) =>{
+
+  try {
+    const token = req.headers.authorization
+    const decoded = jwt_decode(token.slice(7, -1))
+    console.log(decoded)
+
+    const product = await pool.query('SELECT PV.id_store, PV.name, PV.total FROM ( SELECT ABI.*, SUM(V.price_sale) total FROM ( SELECT AB.*, I.id_store FROM ( SELECT A.id AS id_product, A.id_category AS id_category, B.id_inventory, A.name FROM ( SELECT * FROM product ) A INNER JOIN ( SELECT * FROM category ) B ON A.id_category = B.id ) AB INNER JOIN ( SELECT * FROM inventory ) I ON AB.id_inventory = I.id ) ABI LEFT JOIN ( SELECT * FROM sale_product ) V ON ABI.id_product = V.id_product GROUP BY ABI.id_product ) PV WHERE PV.id_store = ? ORDER BY PV.total DESC LIMIT 5', [decoded.id])
+
+    return res.status(200).json({
+      products: product
+    })
+  }catch(error){
+    console.log(error)
+    return res.status(400).json({})
+  }
+}
+
+module.exports = { createProducts, getPhoto, getShopCar, getShopCarDebt, updateProduct, getMostSaleProduct }
