@@ -332,9 +332,9 @@ const getSales = async (req, res) => {
       clients.push(cli)
     }
     let arr = []
-    clients.map((index) => {
-      index.map((jotax) => {
-        arr.push({
+    clients?.map((index) => {
+      index?.map((jotax) => {
+        arr?.push({
           id: jotax.id,
           name: jotax.name,
           lastname: jotax.lastname,
@@ -366,9 +366,9 @@ const getDebts = async (req, res) => {
       clients.push(cli)
     }
     let arr = []
-    clients.map((index) => {
-      index.map((jotax) => {
-        arr.push({
+    clients?.map((index) => {
+      index?.map((jotax) => {
+        arr?.push({
           id: jotax.id,
           name: jotax.name,
           lastname: jotax.lastname,
@@ -415,9 +415,9 @@ const getcurrent_Sale = async (req, res) => {
       clients.push(cli)
     }
     let arr = []
-    clients.map((index) => {
-      index.map((jotax) => {
-        arr.push({
+    clients?.map((index) => {
+      index?.map((jotax) => {
+        arr?.push({
           id: jotax.id,
           name: jotax.name,
           lastname: jotax.lastname,

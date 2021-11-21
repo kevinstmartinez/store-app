@@ -109,8 +109,8 @@ const getShopCar = async (req, res) => {
      car.push(cli)
    }
    let arr = []
-   car.map((index) => {
-     index.map((jotax) => {
+   car?.map((index) => {
+     index?.map((jotax) => {
        arr.push({
          id: jotax.id,
          barcode: jotax.barcode,
@@ -152,9 +152,9 @@ const getShopCar = async (req, res) => {
        car.push(cli)
      }
      let arr = []
-     car.map((index) => {
-       index.map((jotax) => {
-         arr.push({
+     car?.map((index) => {
+       index?.map((jotax) => {
+         arr?.push({
            id: jotax.id,
            barcode: jotax.barcode,
            image: jotax.image,
