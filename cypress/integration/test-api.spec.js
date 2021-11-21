@@ -24,7 +24,7 @@ describe('Store App', () => {
       password: 'passwordtesting123',
       phone: '000000000',
       address: 'Kr 0 # 0 - 0',
-      store_name: 'Store Test'
+      store_name: 'Store Test',
     })
   })
 
@@ -34,7 +34,6 @@ describe('Store App', () => {
     cy.get('#password').type('passwordtesting123')
     cy.get('#test-button-login').click()
   })
-
 
   it('Should validate the token Sesion', () => {
     cy.login({ username: 'UserTesting', password: 'passwordtesting123' })
@@ -99,17 +98,17 @@ describe('Store App', () => {
     cy.login({ username: 'UserTesting', password: 'passwordtesting123' })
     cy.request({
       method: 'POST',
-      url : 'http://localhost:4000/client/create-client',
-      headers:{
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("glob_token")}`,
+      url: 'http://localhost:4000/client/create-client',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('glob_token')}`,
       },
-      body:{
-        "name" : "Client",
-        "lastname" :"Test",
-        "phone":"0000000"
-      }
-    }).then( (response) => {
+      body: {
+        name: 'Client',
+        lastname: 'Test',
+        phone: '0000000',
+      },
+    }).then((response) => {
       expect(response.status).to.eq(200)
     })
     cy.visit('localhost:3000/admin/clients')
@@ -131,8 +130,7 @@ describe('Store App', () => {
   it('Should show push notifications in the store', () => {
     expect(false).to.eq(false)
   })
-  it('Should create sales in the store', () => {
+  it.only('Should create sales in the store', () => {
     expect(false).to.eq(false)
   })
-  
 })
