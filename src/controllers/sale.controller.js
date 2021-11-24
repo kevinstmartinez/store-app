@@ -266,6 +266,7 @@ const payDebt = async (req, res) => {
       'SELECT total_debt FROM sale WHERE id=?',
       [id_debt]
     )
+    if (payment > total_debt_init[0].total_debt) return res.status(403).json({message: 'El pago no corresponde al monto de la deuda'})
 
     if (total_debt_init[0].total_debt == 0) {
       res.status(200).json({
@@ -296,7 +297,7 @@ const payDebt = async (req, res) => {
         'SELECT total_debt FROM sale WHERE id=?',
         [id_debt]
       )
-
+      
       console.log('total_debt:', total_debt[0].total_debt)
       console.log('sale_update:', sale_updated)
       //console.log("debt:",debt[0].total_debt)
@@ -531,6 +532,60 @@ const delete_debt_product = async (req, res) => {
     return res.status(400).json({})
   }
 }
+const getAccumulatedSales = async (req, res) =>{
+  try {
+    const token = req.headers.authorization
+    const decoded = jwt_decode(token.slice(7, -1))
+    const sales = await pool.query('SELECT DISTINCT A.Fecha_cierre,SUM(A.total_sale) total, A.id_store FROM (SELECT *, LAST_DAY(date_sale) Fecha_cierre FROM sale)A WHERE A.id_store = ? GROUP BY A.Fecha_cierre, A.id_store ORDER BY A.Fecha_cierre', [decoded.id])
+    return res.status(200).json({
+      sales
+    })
+  }catch(error){
+    console.log(error)
+    return res.status(400).json({})
+  }
+}
+const getAccumulatedDebts = async (req, res) =>{
+  try {
+    const token = req.headers.authorization
+    const decoded = jwt_decode(token.slice(7, -1))
+    const sales = await pool.query('SELECT DISTINCT A.Fecha_cierre,SUM(A.total_debt) total, A.id_store FROM (SELECT *, LAST_DAY(date_sale) Fecha_cierre FROM sale)A WHERE A.id_store = ? GROUP BY A.Fecha_cierre, A.id_store ORDER BY A.Fecha_cierre', [decoded.id])
+    return res.status(200).json({
+      sales
+    })
+  }catch(error){
+    console.log(error)
+    return res.status(400).json({})
+  }
+}
+
+const grandTotalSale = async(req, res) =>{
+  try {
+    const token = req.headers.authorization
+    const decoded = jwt_decode(token.slice(7, -1))
+    const sales = await pool.query('SELECT SUM(total_sale) grand_total FROM sale WHERE id_store = ?', [decoded.id])
+    return res.status(200).json(
+      sales[0]
+    )
+  }catch(error){
+    console.log(error)
+    return res.status(400).json({})
+  }
+}
+
+const grandTotalDebt = async(req, res) =>{
+  try {
+    const token = req.headers.authorization
+    const decoded = jwt_decode(token.slice(7, -1))
+    const sales = await pool.query('SELECT SUM(total_debt) grand_total FROM sale WHERE id_store = ?', [decoded.id])
+    return res.status(200).json(
+      sales[0]
+    )
+  }catch(error){
+    console.log(error)
+    return res.status(400).json({})
+  }
+}
 
 module.exports = {
   createSale,
@@ -543,4 +598,8 @@ module.exports = {
   delete_sale_product,
   delete_debt_product,
   getcurrent_Sale,
+  getAccumulatedSales,
+  getAccumulatedDebts,
+  grandTotalSale,
+  grandTotalDebt
 }

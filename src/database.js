@@ -29,7 +29,7 @@ pool.getConnection((err, connection) => {
       console.log('DATABASE HAS TO MANY CONNECTIONS')
     }
     if (err.code === 'ECONNREFUSED') {
-      console.log('DATABASE CONNECTION WAS REFUSED')
+      console.log(err)
     }
   }
 

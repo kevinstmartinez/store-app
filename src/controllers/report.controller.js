@@ -10,7 +10,7 @@ const createReport = async (req, res) => {
   let doc = new pdf({ margin: 50 })
   let dataUtilities
 
-  const path = 'C:/Users/Yulian/Desktop/report.pdf'
+  const path = 'C:/Users/Yulian/Documents/Reportes/report.pdf'
   try {
     const token = req.headers.authorization
     const decoded = jwt_decode(token.slice(7, -1))
@@ -37,11 +37,9 @@ const createReport = async (req, res) => {
 
         doc.pipe(fs.createWriteStream(path)) // write to PDF
         doc.pipe(res)
-        doc.fontSize(25).text('text', 100, 100)
+
         doc.end()
-        return res
-          .status(200)
-          .json({ path: 'C:/Users/Yulian/Desktop/report.pdf' })
+        return res.status(200)
       } catch (error) {
         console.log(error)
       }
@@ -49,6 +47,7 @@ const createReport = async (req, res) => {
     async function generateHeader(doc) {
       const token = req.headers.authorization
       let data
+      let data2
       await axios
         .get('http://localhost:4000/api/balance/utilities', {
           headers: {
@@ -58,23 +57,46 @@ const createReport = async (req, res) => {
         })
         .then((res) => console.log((data = res.data)))
         .catch((err) => console.log(err))
+      await axios
+        .get('http://localhost:4000/api/products/most-seller-products', {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: token,
+          },
+        })
+        .then((res) => console.log((data2 = res.data)))
+        .catch((err) => console.log(err))
+
+      console.log(data2.products[0])
+
       console.log('axios:', data)
       doc
         // .image('logo.png', 50, 45, { width: 50 })
         .fillColor('#444444')
-        .fontSize(20)
-        .text('Tenderosbog', 50, 57)
+        .fontSize(10)
+        .text('Reporte General - Tenderosbog', 50, 57)
         .fontSize(13)
         .text('Utilidad: ' + data.grossIncome, 200, 65, { align: 'right' })
         .text('Margen de Utilidad: ' + data.marginGrossIncome, 200, 80, {
           align: 'right',
         })
+        .fontSize(13)
+        .text(
+          'Producto mas vendido: ' +
+            data2.products[0].name +
+            data2.products[0].total,
+          200,
+          95,
+          {
+            align: 'right',
+          }
+        )
         .moveDown()
     }
     function generateCustomerInformation(doc, report) {
-      generateHr(doc, 185)
+      // generateHr(doc, 185)
 
-      const customerInformationTop = 200
+      const customerInformationTop = 90
       doc
         .text(
           `Nombre: ${report.store[0].store_name}`,
@@ -92,7 +114,7 @@ const createReport = async (req, res) => {
           customerInformationTop + 30
         )
         .moveDown()
-      generateHr(doc, 252)
+      //  generateHr(doc, 200)
     }
 
     async function generateFooter(doc) {}
@@ -100,17 +122,17 @@ const createReport = async (req, res) => {
     function generateHr(doc, y) {
       doc
         .strokeColor('#aaaaaa')
-        .lineWidth(1)
+        //.lineWidth(1)
         .moveTo(50, y)
         .lineTo(550, y)
         .stroke()
     }
     async function generateReporTable(doc, report) {
-      let reportTableTop = 330
+      let reportTableTop = 200
       for (let i = 0; i < report.sale.length; i++) {
         const item = report.sale[i]
-        const invoiceTableTop = 330
-        const position = reportTableTop + (i + 1) * 50
+        const invoiceTableTop = 200
+        const position = reportTableTop + (i + 1) * 12
         let dateString = moment(item.date_sale).format('YYYY-MM-DD')
         const clientsSales = await pool.query(
           'SELECT name,lastname FROM client WHERE id=?',
@@ -128,7 +150,7 @@ const createReport = async (req, res) => {
           'Total venta',
           'Total deuda'
         )
-        generateHr(doc, invoiceTableTop + 20)
+        // generateHr(doc, invoiceTableTop + 20)
 
         generateTableRow(
           doc,
@@ -139,14 +161,14 @@ const createReport = async (req, res) => {
           item.total_sale,
           item.total_debt
         )
-        generateHr(doc, position + 20)
+        //generateHr(doc, position + 20)
         /* console.log('sales items', item) */
       }
     }
 
     function generateTableRow(doc, y, c1, c2, c3, c4, c5) {
       doc
-        .fontSize(12)
+        .fontSize(8)
         .text(c1, 50, y)
         .text(c2, 150, y)
         .text(c3, 250, y, { width: 90, align: 'right' })

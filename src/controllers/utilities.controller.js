@@ -31,8 +31,6 @@ const getUtilities = async (req, res) => {
 
     for (let i = 0; i < products.length; i++) {
       for (let j = 0; j < products[i].length; j++) {
-     
-
         totalExpense += products[i][j].unit_cost * products[i][j].quantity
       }
     }
@@ -45,7 +43,7 @@ const getUtilities = async (req, res) => {
     for (let i = 0; i < sales.length; i++) {
       totalSale += sales[i].total_sale
     }
-    grossIncome = totalSale -totalExpense
+    grossIncome = totalSale - totalExpense
     marginGrossIncome = ( grossIncome / totalSale ) * 100
     const obj = {
       grossIncome,

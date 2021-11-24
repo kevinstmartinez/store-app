@@ -11,6 +11,10 @@ import {
   delete_sale_product,
   delete_debt_product,
   getcurrent_Sale,
+  getAccumulatedSales,
+  getAccumulatedDebts,
+  grandTotalSale,
+  grandTotalDebt
 } from '../controllers/sale.controller'
 
 import { verifyToken, isSeller } from '../middlewares/index'
@@ -23,6 +27,10 @@ router.get('/get-sales', [verifyToken, isSeller], getSales)
 router.get('/get-debts', [verifyToken, isSeller], getDebts)
 router.get('/get-currentsale', [verifyToken, isSeller], getcurrent_Sale)
 router.get('/get-sale_products/:id', [verifyToken, isSeller], getsale_Product)
+router.get('/acc-sales', [verifyToken, isSeller], getAccumulatedSales)
+router.get('/acc-debts', [verifyToken, isSeller], getAccumulatedDebts)
+router.get('/grand-total-sale', [verifyToken, isSeller], grandTotalSale)
+router.get('/grand-total-debt', [verifyToken, isSeller], grandTotalDebt)
 router.delete(
   '/delete_sale_product/:id',
   [verifyToken, isSeller],
