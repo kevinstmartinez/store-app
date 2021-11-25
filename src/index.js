@@ -25,9 +25,11 @@ import cors from 'cors'
 import MySQLStore from 'express-mysql-session'
 
 
-const sessionStore = new MySQLStore({host:process.env.DB_HOST, port: 3306, user:process.env.DB_USER, password:process.env.DB_PASSWORD, database:process.env.DB_DATABASE})
+const sessionStore = new MySQLStore({ host: process.env.DB_HOST, port: 3306, user: process.env.DB_USER, password: process.env.DB_PASSWORD, database: process.env.DB_DATABASE })
 
 import { generateUploadURL } from './s3'
+// import pdfshift from './routes/generate-report.routes'
+import pdf from './routes/generate-report.routes'
 
 let allowedOrigins = ['http://localhost:3000']
 
@@ -48,12 +50,12 @@ app.use(
 app.use(morgan('dev'))
 
 app.use(cors({
-  origin: function(origin, callback){
+  origin: function (origin, callback) {
 
-    if(!origin) return callback(null, true);
-    if(allowedOrigins.indexOf(origin) === -1){
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
       var msg = 'The CORS policy for this site does not ' +
-                'allow access from the specified Origin.';
+        'allow access from the specified Origin.';
       return callback(new Error(msg), false);
     }
     return callback(null, true);
@@ -69,7 +71,7 @@ app.use('/inventory', createCategory)
 app.use('/supplier', creatSupplier)
 app.use('/products', createProducts)
 app.use('/client', createClient)
-app.use('/client',getClient)
+app.use('/client', getClient)
 app.use('/products', getPhoto)
 app.use('/api/products', updateProduct)
 app.use('/api/sales/', createSale)
@@ -79,13 +81,18 @@ app.use('/api/sales/', payDebt)
 app.use('/api/inventory', getInventory)
 app.use('/api/sales/', getSales)
 app.use('/api/sales/', getDebts)
-app.use('/api/balance/',getUtilities)
+app.use('/api/balance/', getUtilities)
 app.use('/api/report', createReport)
-app.use('/api/supplier', getSupplier) 
+app.use('/api/supplier', getSupplier)
 
 app.get('/s3Url', async (req, res) => {
   const url = await generateUploadURL()
-  res.send({url})
+  res.send({ url })
+})
+
+app.post('/report', async (req, res) => {
+  pdf()
+  res.sendStatus(200)
 })
 
 app.listen(port, () => {
