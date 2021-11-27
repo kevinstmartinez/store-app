@@ -7,10 +7,9 @@ const createClient = async (req, res) => {
     const decoded = jwt_decode(token.slice(7, -1))
 
     console.log(decoded)
-    const client = await pool.query(
-      'SELECT * FROM client WHERE id_store=?',
-      [decoded.id]
-    )
+    const client = await pool.query('SELECT * FROM client WHERE id_store=?', [
+      decoded.id,
+    ])
     console.log(client)
     console.log(phone)
 
@@ -37,9 +36,7 @@ const createClient = async (req, res) => {
   }
 }
 
-
 const getClient = async (req, res) => {
-
   try {
     const token = req.headers.authorization
     const decoded = jwt_decode(token.slice(7, -1))
@@ -49,12 +46,10 @@ const getClient = async (req, res) => {
       decoded.id,
     ])
 
-
     return res.status(200).json({
       message: 'Clientes',
-      client
+      client,
     })
-
   } catch (e) {
     console.error(e)
   }
@@ -65,10 +60,13 @@ const mostDebtClient = async (req, res) => {
     const token = req.headers.authorization
     const decoded = jwt_decode(token.slice(7, -1))
     console.log(decoded)
-    const clients = await pool.query('SELECT CL.* FROM (SELECT AB.id_client, AB.name, AB.id_store, SUM(C.price_sale) AS total FROM (SELECT A.id AS id_client, B.id AS id_sale, B.id_store AS id_store, A.name FROM ( SELECT * FROM client ) A INNER JOIN ( SELECT * FROM sale )B ON A.id = B.id_client) AB LEFT JOIN ( SELECT * FROM sale_debt )C ON AB.id_sale = C.id_sale WHERE AB.id_store = ? GROUP BY AB.id_client, AB.id_store) CL ORDER BY CL.total DESC LIMIT 5', [decoded.id])
-  
+    const clients = await pool.query(
+      'SELECT     A.id,    CONCAT(A.name,  " ", A.lastname) AS name,    A.id_store,    SUM(A.total_debt) AS total     FROM     (SELECT C.id, C.name, C.lastname, S.total_debt, S.id_store FROM     (SELECT * FROM client)C    INNER JOIN    (SELECT * FROM sale)S    ON C.id = S.id_client)A    WHERE A.id_store = ?    GROUP BY A.id    ORDER BY total DESC    LIMIT 5',
+      [decoded.id]
+    )
+
     return res.status(200).json({
-      clients
+      clients,
     })
   } catch (e) {
     console.error(e)
@@ -76,20 +74,27 @@ const mostDebtClient = async (req, res) => {
   }
 }
 
-const clientsWithMostSale = async (req, res) =>{
+const clientsWithMostSale = async (req, res) => {
   try {
     const token = req.headers.authorization
     const decoded = jwt_decode(token.slice(7, -1))
     console.log(decoded)
 
-    const clients = await pool.query('SELECT CL.* FROM (SELECT AB.id_client, AB.name, AB.id_store, SUM(C.price_sale) AS total FROM (SELECT A.id AS id_client, B.id AS id_sale, B.id_store AS id_store, A.name FROM ( SELECT * FROM client ) A INNER JOIN ( SELECT * FROM sale )B ON A.id = B.id_client) AB LEFT JOIN ( SELECT * FROM sale_product )C ON AB.id_sale = C.id_sale WHERE AB.id_store =? GROUP BY AB.id_client, AB.id_store) CL ORDER BY CL.total DESC LIMIT 5', [decoded.id])
+    const clients = await pool.query(
+      'SELECT CL.* FROM (SELECT AB.id_client, AB.name, AB.id_store, SUM(C.price_sale) AS total FROM (SELECT A.id AS id_client, B.id AS id_sale, B.id_store AS id_store, A.name FROM ( SELECT * FROM client ) A INNER JOIN ( SELECT * FROM sale )B ON A.id = B.id_client) AB LEFT JOIN ( SELECT * FROM sale_product )C ON AB.id_sale = C.id_sale WHERE AB.id_store =? GROUP BY AB.id_client, AB.id_store) CL ORDER BY CL.total DESC LIMIT 5',
+      [decoded.id]
+    )
     return res.status(200).json({
-      clients
+      clients,
     })
-
-  }catch(e){
+  } catch (e) {
     console.error(e)
     res.status(400).json({ e })
   }
 }
-module.exports = { createClient, getClient, mostDebtClient, clientsWithMostSale }
+module.exports = {
+  createClient,
+  getClient,
+  mostDebtClient,
+  clientsWithMostSale,
+}

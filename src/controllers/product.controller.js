@@ -162,6 +162,7 @@ const getShopCar = async (req, res) => {
   })
   return res.status(200).json({
     arr,
+    current_sale,
   })
 }
 const getShopCarDebt = async (req, res) => {
@@ -174,7 +175,10 @@ const getShopCarDebt = async (req, res) => {
       'SELECT * FROM sale_debt WHERE id_sale=?',
       [idSessionSale.id_sale]
     )
-    console.log(current_sale_debt)
+    const current_sale = await pool.query('SELECT * FROM sale WHERE id=?', [
+      idSessionSale.id_sale,
+    ])
+    console.log(current_sale)
 
     for (let index = 0; index < current_sale_debt.length; ++index) {
       const cli = await pool.query(
@@ -204,6 +208,7 @@ const getShopCarDebt = async (req, res) => {
     })
     return res.status(200).json({
       arr,
+      current_sale,
     })
   } catch (error) {
     console.log(error)
